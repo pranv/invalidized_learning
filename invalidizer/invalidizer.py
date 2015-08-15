@@ -34,21 +34,20 @@ def join(patches):
 
 	return joined_patch
 
-def get_noise_grid(image_length, tile_length, width, std):
+def get_noise_grid(image_length, tile_length, width):
 	'''
-		For a given 'tile_size' and 'image_length', generate a gaussian noise 3D tensor that 
+		For a given 'tile_length' and 'image_length', generate a gaussian noise 3D tensor that 
 		can be added to the invalid image to smooth out the boundaries.
 	'''
+	return 
 
-	pass
-
-def invalidizer(image, tile_length, window_size, sigma=1.0):
+def invalidizer(image, tile_length, window_length, sigma=3.0):
 	image_length, _, _ = image.shape
 	
-	nb_windows = (image_length / window_size) ** 2
-	nb_tiles = (window_size / tile_length) ** 2
+	nb_windows = (image_length / window_length) ** 2
+	nb_tiles = (window_length / tile_length) ** 2
 
-	windows = split(image, window_size)
+	windows = split(image, window_length)
 
 	for i in range(nb_windows):
 		tiles = split(windows[i], tile_length)
@@ -56,8 +55,7 @@ def invalidizer(image, tile_length, window_size, sigma=1.0):
 		windows[i] = join(tiles)
 
 	invalid_image = join(windows)
-
-	smooth_invalid_image = invalid_image - get_noise_grid(image_length, tile_length, 4, 0.01)
+	
+	smooth_invalid_image = invalid_image + get_noise_grid(image_length, tile_length, 8)
 
 	return smooth_invalid_image
-	#return invalid_image
