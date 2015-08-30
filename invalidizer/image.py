@@ -1,7 +1,7 @@
-# OM
 import numpy as np
-import matplotlib.pyplot as plt
-plt.ion()
+from copy import deepcopy
+
+from scipy.ndimage import gaussian_filter
 
 def split(patch, size):
 	sub_patches = []
@@ -34,14 +34,39 @@ def join(patches):
 
 	return joined_patch
 
-def get_noise_grid(image_length, tile_length, width):
+def smoothen(image, image_length, tile_length, width):
 	'''
 		For a given 'tile_length' and 'image_length', generate a gaussian noise 3D tensor that 
 		can be added to the invalid image to smooth out the boundaries.
 	'''
-	return 
 
-def invalidizer(image, tile_length, window_length, sigma=3.0):
+	for w in range(width):
+		for a in range(tile_length, image_length, tile_length):
+			for i in range(a-w, a+w):
+				mean = deepcopy(np.mean(image[i:i+2, :, :], axis=0))
+				mean = mean.reshape(1, image_length, 3)
+				mean = np.concatenate([mean, mean], axis=0)
+				image[i:i+2, :, :] =  mean
+				
+				mean = deepcopy(np.mean(image[:,i:i+2, :], axis=1))
+				mean = mean.reshape(image_length,1, 3)
+				mean = np.concatenate([mean, mean], axis=1)
+				image[:,i:i+2, :] =  mean
+			
+			for i in range(a+w, a-w):
+				mean = deepcopy(np.mean(image[i:i+2, :, :], axis=0))
+				mean = mean.reshape(1, image_length, 3)
+				mean = np.concatenate([mean, mean], axis=0)
+				image[i:i+2, :, :] =  mean
+				
+				mean = deepcopy(np.mean(image[:,i:i+2, :], axis=1))
+				mean = mean.reshape(image_length,1, 3)
+				mean = np.concatenate([mean, mean], axis=1)
+				image[:,i:i+2, :] =  mean
+				
+	return image
+
+def invalidizer(image, tile_length, window_length):
 	image_length, _, _ = image.shape
 	
 	nb_windows = (image_length / window_length) ** 2
@@ -56,6 +81,6 @@ def invalidizer(image, tile_length, window_length, sigma=3.0):
 
 	invalid_image = join(windows)
 	
-	smooth_invalid_image = invalid_image + get_noise_grid(image_length, tile_length, 8)
+	smooth_invalid_image = smoothen(invalid_image, image_length, tile_length, tile_length/4)
 
 	return smooth_invalid_image
