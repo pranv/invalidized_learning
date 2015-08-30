@@ -84,3 +84,18 @@ def invalidizer(image, tile_length, window_length):
 	smooth_invalid_image = smoothen(invalid_image, image_length, tile_length, tile_length/4)
 
 	return smooth_invalid_image
+def translate(image,image_size,shift_size_x,shift_size_y):
+	translate=deepcopy(image)
+	for i in range(image_size):
+		for j in range(shift_size_x):
+			for k in range(image.shape[2]):
+				translate[i,j,k]=0
+	for i in range(shift_size_y):
+		for j in range(image_size):
+			for k in range(image.shape[2]):
+				translate[i,j,k]=0
+	return translate	
+		
+def rotate(image,angle):
+	rot=ndimage.interpolation.rotate(image,angle)
+	return rot
