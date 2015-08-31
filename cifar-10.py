@@ -37,7 +37,7 @@ def load_data(path):
     return (X_train, y_train), (X_test, y_test)
 
 
-path = '/Users/pran/Desktop/Deep Learning/Datasets/cifar-10-batches-py'
+path = './datasets/cifar-10-batches-py'
 
 (X_train, y_train), (X_test, y_test) = load_data(path)
 
