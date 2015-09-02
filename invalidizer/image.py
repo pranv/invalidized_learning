@@ -1,7 +1,6 @@
 import numpy as np
 from copy import deepcopy
-
-from scipy.ndimage import gaussian_filter
+from scipy.ndimage.interpolation import rotate
 
 def split(patch, size):
 	sub_patches = []
@@ -34,40 +33,49 @@ def join(patches):
 
 	return joined_patch
 
-def smoothen(image, image_length, tile_length, width):
+def smoothen(image, image_length, tile_length, width, num_channels):
 	'''
-		For a given 'tile_length' and 'image_length', generate a gaussian noise 3D tensor that 
-		can be added to the invalid image to smooth out the boundaries.
+		Roughly interpolate the edges
 	'''
-
 	for w in range(width):
 		for a in range(tile_length, image_length, tile_length):
 			for i in range(a-w, a+w):
 				mean = deepcopy(np.mean(image[i:i+2, :, :], axis=0))
-				mean = mean.reshape(1, image_length, 3)
+				mean = mean.reshape(1, image_length, num_channels)
 				mean = np.concatenate([mean, mean], axis=0)
 				image[i:i+2, :, :] =  mean
 				
 				mean = deepcopy(np.mean(image[:,i:i+2, :], axis=1))
-				mean = mean.reshape(image_length,1, 3)
+				mean = mean.reshape(image_length,1, num_channels)
 				mean = np.concatenate([mean, mean], axis=1)
 				image[:,i:i+2, :] =  mean
 			
 			for i in range(a+w, a-w):
 				mean = deepcopy(np.mean(image[i:i+2, :, :], axis=0))
-				mean = mean.reshape(1, image_length, 3)
+				mean = mean.reshape(1, image_length, num_channels)
 				mean = np.concatenate([mean, mean], axis=0)
 				image[i:i+2, :, :] =  mean
 				
 				mean = deepcopy(np.mean(image[:,i:i+2, :], axis=1))
-				mean = mean.reshape(image_length,1, 3)
+				mean = mean.reshape(image_length,1, num_channels)
 				mean = np.concatenate([mean, mean], axis=1)
 				image[:,i:i+2, :] =  mean
 				
 	return image
 
+def _rotate(image, angle):
+	rotated = rotate(image,angle)
+	return rotated
+
+def _translate(image, trans_x, trans_y):
+	image_length, _, num_channels = image.shape
+	translate = image[trans_x:, trans_y:, :]
+	t_y = np.concatenate([translate, np.zeros(image_length, trans_y, num_channels)], axis=0)
+	t_x = np.concatenate([t_y, np.zeros(trans_x, image_length-trans_y, num_channels)], axis=1)
+	return translate
+
 def invalidizer(image, tile_length, window_length):
-	image_length, _, _ = image.shape
+	image_length, _, num_channels = image.shape
 	
 	nb_windows = (image_length / window_length) ** 2
 	nb_tiles = (window_length / tile_length) ** 2
@@ -80,22 +88,8 @@ def invalidizer(image, tile_length, window_length):
 		windows[i] = join(tiles)
 
 	invalid_image = join(windows)
-	
-	smooth_invalid_image = smoothen(invalid_image, image_length, tile_length, tile_length/4)
+	smooth_invalid_image = smoothen(invalid_image, image_length, tile_length, tile_length/4, num_channels)
 
-	return smooth_invalid_image
-def translate(image,image_size,shift_size_x,shift_size_y):
-	translate=deepcopy(image)
-	for i in range(image_size):
-		for j in range(shift_size_x):
-			for k in range(image.shape[2]):
-				translate[i,j,k]=0
-	for i in range(shift_size_y):
-		for j in range(image_size):
-			for k in range(image.shape[2]):
-				translate[i,j,k]=0
-	return translate	
-		
-def rotate(image,angle):
-	rot=ndimage.interpolation.rotate(image,angle)
-	return rot
+	translated = _translate(smooth_invalid_image, np.random.random_integers(0, image_length/4), np.random.random_integers(0, image_length/4))
+	rotated = _rotate(translated, np.random.random_integers(0, 20))
+	return rotated
