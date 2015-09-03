@@ -1,5 +1,3 @@
-# invalidized_learning
-Learning to differentiate between valid and invalid data.
-Given image is split into tiles and localized shuffling is applied.
-Then this shuffled image is smoothened along margins of tiles to ensure model doesn't detect edges.
-Further translation and rotation is applied to the image to ensure efficient learning. 
+# Invalidized Learning
+## The Idea:
+All natural observations have an inherent patterns in them. This makes the number of possible observations very less (manifold hypothesis). For example, most permutations of 255 RGB values won't result in an image. Further, stepping up a level of abstraction, most permutations of edges don't result in a valid image, and most combinations of contours don't lead to valid image as well. Using this property, the idea is to split the image into small pieces called 'tiles' and then to obtain an invalid image by shuffling them. By varying the size of the tile, from one pixel to several pixels, we get a set of invalid images. These invalid images are invalid at different levels of abstraction. When the tile size is small, the image is invalid due to lack of edges. When the tile size is big, the image is invalid due to lack of a naturally observable contour. We then train a DNN to differentiate between valid and invalid images. This, in my opinion should enforce the network to learn the heirarcy of abstract representations, as learnt by purely supervised DNN classifiers. This can then be used in a purely supervised environment. The idea can be extended to other data as well.
