@@ -67,12 +67,21 @@ def _rotate(image, angle):
 	rotated = rotate(image,angle)
 	return rotated
 
-def _translate(image, trans_x, trans_y):
-	image_length, _, num_channels = image.shape
-	translate = image[trans_x:, trans_y:, :]
-	t_y = np.concatenate([translate, np.zeros(image_length, trans_y, num_channels)], axis=0)
-	t_x = np.concatenate([t_y, np.zeros(trans_x, image_length-trans_y, num_channels)], axis=1)
-	return translate
+def translate(image,shift_size_x,shift_size_y):
+	translate=deepcopy(image)
+	image_size=image.shape[0]
+	for j in range(image_size-shift_size_x):
+		for i in range(image_size-shift_size_y):
+			translate[i+shift_size_y,j+shift_size_x,:]=image[i,j,:]
+	
+	for j in range(shift_size_x):
+		for i in range(image_size):
+			translate[i,j,:]=0
+	for j in range(image_size):
+		for i in range(shift_size_y):
+			translate[i,j,:]=0
+	
+	return translate	
 
 def invalidizer(image, tile_length, window_length):
 	image_length, _, num_channels = image.shape
