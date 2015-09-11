@@ -11,5 +11,11 @@ As per the above explanation, these invalid images are invalid at different leve
 
 We then train a DNN to differentiate between valid and invalid images. We hope to see features observed in natural images like edges, contours and shapes are learnt at various layers of the DNN. Randomly shuffled inputs do not have any consistent pattern that the DNN can exploit to differentiate between the two. Hence it should be forced to have activations for features of natural images only.
 
+Here is an example from ImageNet:
+
+<img src="https://cloud.githubusercontent.com/assets/8753078/9814330/aca56cb6-58aa-11e5-837c-56602ab9c820.png" width="45%">
+<img src="https://cloud.githubusercontent.com/assets/8753078/9814331/ad35e368-58aa-11e5-9c8a-5c43f9e9b789.png" width="45%">
+
+
 ## Related Work
 Although independently conceived and developed, this idea is similar to the works Noise Contrastive Estimation (Gutmann et al.) and Generative Adversarial Nets (Goodfellow et al.). The difference however is in the way the methods employed to generate invalid data points and the distributions of the inputs to the classifiers.
