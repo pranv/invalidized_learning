@@ -1,9 +1,13 @@
 
+.gitignore
+
 *.pyc
 
-datasets/cifar-10-batches-py/data_batch_1
-
 *.meta
+
+*.html
+
+datasets/cifar-10-batches-py/data_batch_1
 
 datasets/cifar-10-batches-py/data_batch_2
 
@@ -11,8 +15,8 @@ datasets/cifar-10-batches-py/data_batch_3
 
 datasets/cifar-10-batches-py/data_batch_4
 
-*.html
-
 datasets/cifar-10-batches-py/test_batch
 
 datasets/cifar-10-batches-py/data_batch_5
+
+
